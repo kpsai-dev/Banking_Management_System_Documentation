@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: BankingManagementSystem
+
+  datasource:
+    url:  ${DEV_DB_URL}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
