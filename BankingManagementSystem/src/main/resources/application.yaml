@@ -34,4 +34,26 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,caches
+        include: health,info,metrics,caches,beans,mappings,env
+
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Banking Management System
+    version: 1.0
+    developer: Sai
