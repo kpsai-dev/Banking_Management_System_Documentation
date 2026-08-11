@@ -1,454 +1,281 @@
-# Postman Employee API - API Design Document
+# API Design Document
 
 ## 1. Overview
 
-The Postman Employee API is a Spring Boot REST application used to manage departments and employees.
+The Banking Management System provides REST APIs for managing employees and performing banking account operations.
 
-The API provides CRUD operations for:
-
-- Departments
-- Employees
-
-Employees are associated with departments using a many-to-one relationship.
+The APIs follow REST principles and use JSON for request and response data.
 
 ---
 
 ## 2. Base URL
 
-Local development base URL:
+For local development:
 
 ```text
 http://localhost:8080
 ```
 
-API base path:
+API version:
 
 ```text
-/api
+/api/v1
 ```
 
 ---
 
-## 3. Content Type
+# 3. Employee APIs
 
-Requests containing a body use:
-
-```http
-Content-Type: application/json
-```
-
-Responses are returned in JSON format except DELETE operations, which return no response body.
-
----
-
-# 4. Department Endpoints
-
-## 4.1 Create Department
-
-Creates a new department.
+## 3.1 Get All Employees
 
 ### Endpoint
 
 ```http
-POST /api/departments
+GET /api/v1/employees
 ```
 
-### Request Body
+### Description
 
-```json
-{
-  "name": "Information Technology",
-  "location": "Bangalore"
-}
-```
+Retrieves a paginated list of employees.
 
-### Validation
+### Query Parameters
 
-- `name` is required.
-- Department name must not be blank.
-- Department name is unique.
-
-### Success Response
-
-**Status: 201 Created**
-
-```json
-{
-  "id": 1,
-  "name": "Information Technology",
-  "location": "Bangalore"
-}
-```
-
----
-
-## 4.2 Get All Departments
-
-Returns all departments.
-
-### Endpoint
-
-```http
-GET /api/departments
-```
-
-### Success Response
-
-**Status: 200 OK**
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Information Technology",
-    "location": "Bangalore"
-  }
-]
-```
-
-If no departments exist:
-
-```json
-[]
-```
-
----
-
-## 4.3 Get Department By ID
-
-Returns a department using its ID.
-
-### Endpoint
-
-```http
-GET /api/departments/{id}
-```
-
-### Path Parameter
-
-| Parameter | Type | Description |
+| Parameter | Description | Example |
 |---|---|---|
-| id | Long | Department ID |
+| page | Page number | 0 |
+| size | Number of records per page | 10 |
 
-### Example
-
-```http
-GET /api/departments/1
-```
-
-### Success Response
-
-**Status: 200 OK**
-
-```json
-{
-  "id": 1,
-  "name": "Information Technology",
-  "location": "Bangalore"
-}
-```
-
-### Error Response
-
-**Status: 404 Not Found**
-
-```json
-{
-  "status": 404,
-  "error": "Not Found",
-  "message": "Department not found with id: 100"
-}
-```
-
----
-
-## 4.4 Update Department
-
-Updates an existing department.
-
-### Endpoint
+### Example Request
 
 ```http
-PUT /api/departments/{id}
+GET /api/v1/employees?page=0&size=10
 ```
-
-### Path Parameter
-
-| Parameter | Type | Description |
-|---|---|---|
-| id | Long | Department ID |
-
-### Request Body
-
-```json
-{
-  "name": "Information Technology",
-  "location": "Bengaluru"
-}
-```
-
-### Success Response
-
-**Status: 200 OK**
-
-```json
-{
-  "id": 1,
-  "name": "Information Technology",
-  "location": "Bengaluru"
-}
-```
-
-### Error Response
-
-Returns `404 Not Found` if the department does not exist.
-
----
-
-## 4.5 Delete Department
-
-Deletes an existing department.
-
-### Endpoint
-
-```http
-DELETE /api/departments/{id}
-```
-
-### Path Parameter
-
-| Parameter | Type | Description |
-|---|---|---|
-| id | Long | Department ID |
 
 ### Success Response
 
 ```text
-204 No Content
+200 OK
 ```
 
-The response does not contain a body.
+### Example Response
 
-### Error Response
-
-Returns `404 Not Found` if the department does not exist.
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "name": "Sai",
+      "email": "sai@gmail.com",
+      "department": "IT",
+      "salary": 50000
+    }
+  ],
+  "page": 0,
+  "size": 10
+}
+```
 
 ---
 
-# 5. Employee Endpoints
-
-## 5.1 Create Employee
-
-Creates an employee and associates the employee with an existing department.
+## 3.2 Get Employee by ID
 
 ### Endpoint
 
 ```http
-POST /api/employees/department/{departmentId}
+GET /api/v1/employees/{id}
 ```
+
+### Description
+
+Retrieves a single employee using the employee ID.
 
 ### Path Parameter
 
-| Parameter | Type | Description |
-|---|---|---|
-| departmentId | Long | Department assigned to employee |
+| Parameter | Description |
+|---|---|
+| id | Employee ID |
 
-### Request Body
+### Example Request
+
+```http
+GET /api/v1/employees/1
+```
+
+### Success Response
+
+```text
+200 OK
+```
+
+### Example Response
 
 ```json
 {
-  "name": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "designation": "Software Engineer",
+  "id": 1,
+  "name": "Sai",
+  "email": "sai@gmail.com",
+  "department": "IT",
   "salary": 50000
 }
 ```
 
-### Validation
+### Employee Not Found
 
-- `name` must not be blank.
-- `email` must not be blank.
-- `email` must be a valid email address.
-- `designation` must not be blank.
-- `salary` is required.
-- `salary` must be greater than zero.
-- Employee email is unique.
+```text
+404 Not Found
+```
 
-### Success Response
-
-**Status: 201 Created**
+### Example Error Response
 
 ```json
 {
-  "id": 1,
-  "name": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "designation": "Software Engineer",
-  "salary": 50000,
-  "department": {
-    "id": 1,
-    "name": "Information Technology",
-    "location": "Bangalore"
-  }
+  "timestamp": "2026-08-11T10:00:00",
+  "status": 404,
+  "message": "Employee not found",
+  "errors": [],
+  "path": "/api/v1/employees/100"
 }
 ```
 
-### Error Response
-
-Returns `404 Not Found` if `departmentId` does not identify an existing department.
-
 ---
 
-## 5.2 Get All Employees
-
-Returns all employees.
+## 3.3 Create Employee
 
 ### Endpoint
 
 ```http
-GET /api/employees
+POST /api/v1/employees
 ```
 
-### Success Response
+### Content-Type
 
-**Status: 200 OK**
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Rahul Sharma",
-    "email": "rahul@example.com",
-    "designation": "Software Engineer",
-    "salary": 50000,
-    "department": {
-      "id": 1,
-      "name": "Information Technology",
-      "location": "Bangalore"
-    }
-  }
-]
+```text
+application/json
 ```
 
----
+### Description
 
-## 5.3 Get Employee By ID
-
-Returns an employee using its ID.
-
-### Endpoint
-
-```http
-GET /api/employees/{id}
-```
-
-### Path Parameter
-
-| Parameter | Type | Description |
-|---|---|---|
-| id | Long | Employee ID |
-
-### Example
-
-```http
-GET /api/employees/1
-```
-
-### Success Response
-
-**Status: 200 OK**
-
-```json
-{
-  "id": 1,
-  "name": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "designation": "Software Engineer",
-  "salary": 50000,
-  "department": {
-    "id": 1,
-    "name": "Information Technology",
-    "location": "Bangalore"
-  }
-}
-```
-
-### Error Response
-
-Returns `404 Not Found` if the employee does not exist.
-
----
-
-## 5.4 Update Employee
-
-Updates an employee and its department association.
-
-### Endpoint
-
-```http
-PUT /api/employees/{id}/department/{departmentId}
-```
-
-### Path Parameters
-
-| Parameter | Type | Description |
-|---|---|---|
-| id | Long | Employee ID |
-| departmentId | Long | Department ID |
+Creates a new employee.
 
 ### Request Body
 
 ```json
 {
-  "name": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "designation": "Senior Software Engineer",
-  "salary": 65000
+  "name": "Sai",
+  "email": "sai@gmail.com",
+  "department": "IT",
+  "salary": 50000
 }
 ```
 
 ### Success Response
 
-**Status: 200 OK**
+```text
+201 Created
+```
+
+### Possible Error Responses
+
+```text
+400 Bad Request
+409 Conflict
+422 Unprocessable Entity
+```
+
+### 400 - Validation Failure
+
+Returned when the request contains invalid data.
+
+Example:
 
 ```json
 {
-  "id": 1,
-  "name": "Rahul Sharma",
-  "email": "rahul@example.com",
-  "designation": "Senior Software Engineer",
-  "salary": 65000,
-  "department": {
-    "id": 1,
-    "name": "Information Technology",
-    "location": "Bangalore"
-  }
+  "name": "",
+  "email": "invalid-email",
+  "department": "IT",
+  "salary": -100
 }
 ```
 
-### Error Responses
+### 409 - Duplicate Email
 
-- `404 Not Found` if employee does not exist.
-- `404 Not Found` if department does not exist.
-- `400 Bad Request` for validation errors.
+Returned when an employee already exists with the requested email.
+
+### 422 - Business Rule Violation
+
+Returned when the request violates an application business rule.
 
 ---
 
-## 5.5 Delete Employee
-
-Deletes an employee.
+## 3.4 Update Employee
 
 ### Endpoint
 
 ```http
-DELETE /api/employees/{id}
+PUT /api/v1/employees/{id}
 ```
+
+### Description
+
+Updates an existing employee.
 
 ### Path Parameter
 
-| Parameter | Type | Description |
-|---|---|---|
-| id | Long | Employee ID |
+| Parameter | Description |
+|---|---|
+| id | Employee ID |
+
+### Example Request
+
+```http
+PUT /api/v1/employees/1
+```
+
+### Request Body
+
+```json
+{
+  "name": "Sai Kumar",
+  "email": "saikumar@gmail.com",
+  "department": "Development",
+  "salary": 60000
+}
+```
+
+### Success Response
+
+```text
+200 OK
+```
+
+### Possible Error Responses
+
+```text
+400 Bad Request
+404 Not Found
+409 Conflict
+422 Unprocessable Entity
+```
+
+---
+
+## 3.5 Delete Employee
+
+### Endpoint
+
+```http
+DELETE /api/v1/employees/{id}
+```
+
+### Description
+
+Deletes an existing employee.
+
+### Example Request
+
+```http
+DELETE /api/v1/employees/1
+```
 
 ### Success Response
 
@@ -456,78 +283,317 @@ DELETE /api/employees/{id}
 204 No Content
 ```
 
-### Error Response
+### Employee Not Found
 
-Returns `404 Not Found` if the employee does not exist.
+```text
+404 Not Found
+```
+
+---
+
+# 4. Account APIs
+
+## 4.1 Deposit Money
+
+### Endpoint
+
+```http
+POST /api/v1/accounts/{id}/deposit
+```
+
+### Description
+
+Deposits the specified amount into an existing account.
+
+### Path Parameter
+
+| Parameter | Description |
+|---|---|
+| id | Account ID |
+
+### Example Request
+
+```http
+POST /api/v1/accounts/1/deposit
+```
+
+### Request Body
+
+```json
+{
+  "amount": 5000
+}
+```
+
+### Success Response
+
+```text
+200 OK
+```
+
+### Possible Error Responses
+
+```text
+400 Bad Request
+404 Not Found
+422 Unprocessable Entity
+```
+
+---
+
+## 4.2 Withdraw Money
+
+### Endpoint
+
+```http
+POST /api/v1/accounts/{id}/withdraw
+```
+
+### Description
+
+Withdraws the specified amount from an existing account.
+
+### Example Request
+
+```http
+POST /api/v1/accounts/1/withdraw
+```
+
+### Request Body
+
+```json
+{
+  "amount": 1000
+}
+```
+
+### Success Response
+
+```text
+200 OK
+```
+
+### Business Rule Violation
+
+If the account does not have sufficient balance:
+
+```text
+422 Unprocessable Entity
+```
+
+---
+
+## 4.3 Get Account Balance
+
+### Endpoint
+
+```http
+GET /api/v1/accounts/{id}/balance
+```
+
+### Description
+
+Returns the current balance of an account.
+
+### Example Request
+
+```http
+GET /api/v1/accounts/1/balance
+```
+
+### Success Response
+
+```text
+200 OK
+```
+
+### Example Response
+
+```json
+{
+  "accountId": 1,
+  "balance": 25000
+}
+```
+
+### Account Not Found
+
+```text
+404 Not Found
+```
+
+---
+
+# 5. Error Response
+
+All application exceptions are handled centrally by the `GlobalExceptionHandler`.
+
+The API uses a standard error response format.
+
+### Structure
+
+```json
+{
+  "timestamp": "2026-08-11T10:00:00",
+  "status": 404,
+  "message": "Employee not found",
+  "errors": [],
+  "path": "/api/v1/employees/100"
+}
+```
+
+### Fields
+
+| Field | Description |
+|---|---|
+| timestamp | Time at which the error occurred |
+| status | HTTP status code |
+| message | User-friendly error message |
+| errors | Detailed validation errors when applicable |
+| path | API endpoint that generated the error |
 
 ---
 
 # 6. HTTP Status Codes
 
-| Status | Meaning | Usage |
+| Status Code | Meaning | Example |
 |---|---|---|
-| 200 | OK | Successful GET and PUT |
-| 201 | Created | Successful POST |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Request validation failure |
-| 404 | Not Found | Employee or department not found |
-| 500 | Internal Server Error | Unexpected server-side failure |
+| 200 | OK | Successful GET, PUT, deposit, or withdraw |
+| 201 | Created | Employee created successfully |
+| 204 | No Content | Employee deleted successfully |
+| 400 | Bad Request | Invalid input or validation failure |
+| 404 | Not Found | Employee or account does not exist |
+| 409 | Conflict | Duplicate email |
+| 422 | Unprocessable Entity | Business rule violation |
+| 500 | Internal Server Error | Unexpected application error |
 
 ---
 
-# 7. Request Flow
+# 7. Validation
 
-```text
-Client / Postman
-       |
-       v
-REST Controller
-       |
-       v
-Service Layer
-       |
-       v
-Repository Layer
-       |
-       v
-SQL Server Database
+Request DTOs use Bean Validation annotations where applicable.
+
+Examples include:
+
+```java
+@NotBlank
+@Email
+@Positive
 ```
 
-The controller receives the HTTP request, the service handles business logic, the repository performs database operations, and the response is returned to the client.
+Invalid requests result in:
+
+```text
+400 Bad Request
+```
+
+Example:
+
+```json
+{
+  "name": "",
+  "email": "abc",
+  "salary": -500
+}
+```
+
+The `GlobalExceptionHandler` converts the validation exception into the standard error response.
 
 ---
 
-# 8. Postman Testing
+# 8. Exception Mapping
 
-The endpoints are maintained in the:
+| Exception | HTTP Status | Purpose |
+|---|---:|---|
+| `ResourceNotFoundException` | 404 | Requested resource does not exist |
+| `DuplicateResourceException` | 409 | Resource already exists |
+| `BusinessException` | 422 | Business rule violation |
+| `MethodArgumentNotValidException` | 400 | Request validation failure |
+| `Exception` | 500 | Unexpected error |
+
+---
+
+# 9. API Testing
+
+The APIs can be tested using Postman.
+
+The Postman collection should be organized as:
 
 ```text
-Postman Employee API
+Banking Management System
+│
+├── Employee APIs
+│   ├── Get All Employees
+│   ├── Get Employee
+│   ├── Create Employee
+│   ├── Update Employee
+│   └── Delete Employee
+│
+└── Account APIs
+    ├── Deposit
+    ├── Withdraw
+    └── Balance
 ```
 
-collection.
+---
 
-The collection contains modules for:
+# 10. Environment Variables
 
-- Departments
-- Employees
-- Cleanup
+The Postman environment should contain:
 
-Environment variables include:
+| Variable | Example |
+|---|---|
+| `baseUrl` | `http://localhost:8080` |
+| `employeeId` | `1` |
+| `accountId` | `1` |
+| `token` | JWT token, if authentication is added |
+
+Requests should use:
 
 ```text
-baseUrl
-token
-departmentId
-employeeId
+{{baseUrl}}/api/v1/employees
 ```
 
-Automated tests validate:
+instead of hardcoding:
 
-- HTTP status codes
-- Response schemas
-- Returned IDs
-- Updated values
-- Request chaining
+```text
+http://localhost:8080/api/v1/employees
+```
 
-The collection can also be executed through Newman CLI.
+---
+
+# 11. Request Chaining
+
+The ID returned by a create request can be stored as a Postman environment variable.
+
+Example test script:
+
+```javascript
+let json = pm.response.json();
+
+pm.environment.set("employeeId", json.id);
+```
+
+The stored ID can then be used in:
+
+```text
+{{baseUrl}}/api/v1/employees/{{employeeId}}
+```
+
+This allows requests to be chained without manually copying IDs.
+
+---
+
+# 12. API Documentation Maintenance
+
+This document must be updated whenever:
+
+- An endpoint is added or removed.
+- An HTTP method changes.
+- Request fields change.
+- Response fields change.
+- HTTP status codes change.
+- Validation rules change.
+- Error response structure changes.
+
+API changes should also be associated with the appropriate Jira ticket.
