@@ -17,7 +17,7 @@ For local development:
 ```text
 http://localhost:8080
 
-3. Employee APIs
+## 3. Employee APIs
 3.1 Get All Employees
 Endpoint
 GET /api/v1/employees
